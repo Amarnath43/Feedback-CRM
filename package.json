@@ -2,7 +2,7 @@
   "name": "acowale-feedback",
   "version": "0.1.0",
   "private": true,
-    "prisma": {
+  "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
