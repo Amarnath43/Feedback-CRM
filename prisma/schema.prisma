@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  PRODUCT
+  FEATURE_REQUEST
+  UI_UX
+  SUPPORT
+  BILLING
+  OTHER
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  category  Category
+  comment   String   @db.Text
+  email     String?
+  status    Status   @default(OPEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([category, createdAt(sort: Desc)])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}
