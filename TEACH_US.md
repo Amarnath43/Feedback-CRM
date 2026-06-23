@@ -1,64 +1,28 @@
 # TEACH_US.md
 
-## What I Learned
+## Use AI for Ideas, Not Decisions
 
-This project gave me hands-on experience building and deploying a complete full-stack application within a limited timeframe.
+One practice that has improved my productivity is treating AI as a brainstorming partner rather than an authority.
 
-The areas where I learned the most were:
+AI is excellent at generating implementation options, identifying edge cases, and accelerating development. However, the final decision should always come from understanding the application's requirements and user experience goals.
 
-* Auth.js authentication and route protection
-* Upstash Redis for rate limiting
-* Health checks and production readiness
-* Deploying and debugging applications on Vercel
+A good example from this project was the feedback status update workflow.
 
-I also gained a better appreciation for project structure and how organizing code by features improves maintainability as an application grows.
+When a feedback status changed, AI suggested refetching the entire dashboard data after every update. While this approach worked, it caused unnecessary network requests and introduced a visible UI refresh.
 
----
+Instead, I updated the affected feedback item in local state immediately and only refreshed the analytics summary. This provided a smoother user experience while reducing unnecessary data fetching.
 
-## Challenges I Faced
+This experience reinforced an important lesson:
 
-The most challenging part was authentication and route protection.
+**The best use of AI is not accepting the first solution it provides. The best use of AI is using it to explore options and then applying engineering judgment to choose the most appropriate one.**
 
-I initially implemented middleware-based protection but later switched to page-level authentication. Since the application only has a small number of protected admin pages, the page-level approach was simpler and easier to maintain while still meeting the requirements.
+My workflow is usually:
 
-Another challenge was keeping the dashboard state synchronized. When feedback status changed, I wanted both the table and analytics to update immediately without requiring a page refresh.
+1. Ask AI for multiple approaches.
+2. Evaluate trade-offs.
+3. Implement the solution that best fits the requirements.
+4. Use AI again for review and validation.
 
----
+AI can significantly increase development speed, but ownership of the solution should always remain with the engineer.
 
-## Features I'm Most Proud Of
-
-* Analytics dashboard with status metrics and category distribution
-* Feedback status management workflow
-* Feature-based project architecture
-* Responsive admin dashboard
-
----
-
-## How I Used AI
-
-AI was used extensively throughout development (approximately 80–90%).
-
-It helped with:
-
-* Exploring implementation approaches
-* Generating initial scaffolding
-* Debugging issues
-* Reviewing architecture decisions
-* Improving documentation
-
-All generated code was reviewed, tested, and adapted before being integrated into the project.
-
----
-
-## What I Would Build Next
-
-If this project evolved further, I would prioritize:
-
-* Audit logs for tracking status changes and admin actions
-* Email notifications for feedback submissions and updates
-
----
-
-## Final Thoughts
-
-The biggest takeaway from this project was learning how to balance speed, simplicity, and maintainability. My goal was to build a clean, production-ready solution that satisfies the requirements without over-engineering the implementation.
+In my experience, developers gain the most value from AI when they treat it as a collaborator that helps them think, rather than as a tool that makes decisions for them.
