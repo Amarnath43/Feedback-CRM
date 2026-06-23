@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createFeedbackSchema } from "@/features/feedback/schemas";
 import { z } from "zod";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +11,8 @@ export async function POST(req: Request) {
 
     // Validate input
     const parsed = createFeedbackSchema.safeParse(body);
+
+    
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -18,6 +22,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    //what does flattenError do ? give example 
 
     const { category, comment, email } = parsed.data;
 
@@ -43,6 +48,70 @@ export async function POST(req: Request) {
     console.error("Feedback submission error:", error);
     return NextResponse.json(
       { error: "Something went wrong. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function GET(req: Request) {
+  // Protect — admin only
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+
+  try {
+    const { searchParams } = new URL(req.url);
+
+    // Pagination
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get("limit") || "10", 10))
+    );
+    const skip = (page - 1) * limit;
+
+    // Filters
+    const category = searchParams.get("category");
+    const status = searchParams.get("status");
+    const search = searchParams.get("search")?.trim();
+
+    // Build where clause
+    const where: Prisma.FeedbackWhereInput = {};
+
+    if (category && category !== "ALL") {
+      where.category = category as Prisma.FeedbackWhereInput["category"];
+    }
+    if (status && status !== "ALL") {
+      where.status = status as Prisma.FeedbackWhereInput["status"];
+    }
+    if (search) {
+      where.comment = { contains: search, mode: "insensitive" };
+    }
+
+    // Fetch data + total count in parallel
+    const [feedback, total] = await Promise.all([
+      prisma.feedback.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.feedback.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      data: feedback,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Fetch feedback error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch feedback" },
       { status: 500 }
     );
   }

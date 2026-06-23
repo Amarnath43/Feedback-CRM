@@ -9,7 +9,7 @@ export const CATEGORIES = [
     "OTHER",
 ] as const;
 
-export const CATEGORY_LABELS: Record<(typeof CATEGORIES)[number], string> = {
+export const CATEGORY_LABELS: Record<string, string> = {
     PRODUCT: "Product",
     FEATURE_REQUEST: "Feature Request",
     UI_UX: "UI/UX",
