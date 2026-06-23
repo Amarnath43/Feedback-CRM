@@ -15,16 +15,24 @@ export function useDashboard() {
   const [status, setStatus] = useState("ALL");
   const [page, setPage] = useState(1);
 
-  // Analytics — fetched once
-  useEffect(() => {
-    fetch("/api/analytics/summary")
-      .then((r) => {
-        if (!r.ok) throw new Error("Unauthorized");
-        return r.json();
-      })
-      .then(setAnalytics)
-      .catch(() => setAnalytics(null));
-  }, []);
+  const fetchAnalytics = useCallback(async () => {
+  try {
+    const res = await fetch("/api/analytics/summary");
+
+    if (!res.ok) {
+      throw new Error("Unauthorized");
+    }
+
+    const data = await res.json();
+    setAnalytics(data);
+  } catch {
+    setAnalytics(null);
+  }
+}, []);
+
+useEffect(() => {
+  fetchAnalytics();
+}, [fetchAnalytics]);
 
   // Feedback — re-fetched on filter/page change
   const fetchFeedback = useCallback(async () => {
@@ -72,5 +80,8 @@ export function useDashboard() {
     setCategory,
     setStatus,
     setPage,
+    fetchFeedback,
+    fetchAnalytics,
+    setFeedback, 
   };
 }

@@ -9,6 +9,10 @@ type Props = {
   loading: boolean;
   page: number;
   onPageChange: (updater: (p: number) => number) => void;
+  updateStatus: (
+    id: string,
+    status: string
+  ) => Promise<void>;
 };
 
 export function FeedbackTable({
@@ -17,6 +21,7 @@ export function FeedbackTable({
   loading,
   page,
   onPageChange,
+  updateStatus
 }: Props) {
   return (
     <section className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -40,12 +45,21 @@ export function FeedbackTable({
                     {item.comment}
                   </p>
 
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${STATUS_STYLES[item.status]
-                      }`}
+                  <select
+                    value={item.status}
+                    onChange={(e) =>
+                      updateStatus(item.id, e.target.value)
+                    }
+                    className="text-xs border border-gray-300 rounded-md px-2 py-1"
                   >
-                    {STATUS_LABELS[item.status]}
-                  </span>
+                    <option value="OPEN">Open</option>
+                    <option value="IN_PROGRESS">
+                      In Progress
+                    </option>
+                    <option value="RESOLVED">
+                      Resolved
+                    </option>
+                  </select>
                 </div>
 
                 <div className="mt-3 space-y-1 text-sm text-gray-500">
@@ -111,12 +125,21 @@ export function FeedbackTable({
                     </td>
 
                     <td className="px-6 py-4">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${STATUS_STYLES[item.status]
-                          }`}
+                      <select
+                        value={item.status}
+                        onChange={(e) =>
+                          updateStatus(item.id, e.target.value)
+                        }
+                        className="text-xs border border-gray-300 rounded-md px-2 py-1"
                       >
-                        {STATUS_LABELS[item.status]}
-                      </span>
+                        <option value="OPEN">Open</option>
+                        <option value="IN_PROGRESS">
+                          In Progress
+                        </option>
+                        <option value="RESOLVED">
+                          Resolved
+                        </option>
+                      </select>
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">

@@ -7,6 +7,8 @@ import { CategoryChart } from "./category-chart";
 import { RecentSubmissions } from "./recent-submissions";
 import { FeedbackFilters } from "./feedback-filters";
 import { FeedbackTable } from "./feedback-table";
+import type { FeedbackItem } from "@/features/dashboard/types"; 
+
 
 export function DashboardClient() {
   const {
@@ -19,8 +21,44 @@ export function DashboardClient() {
     setCategory,
     setStatus,
     setPage,
+    setFeedback,
+    fetchAnalytics
   } = useDashboard();
 
+ const updateStatus = async (
+  id: string,
+  status: FeedbackItem["status"]
+) => {
+  try {
+    const res = await fetch(
+      `/api/feedback/${id}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to update status");
+    }
+
+    setFeedback((prev) => {
+
+  return prev.map((item) =>
+    item.id === id
+      ? { ...item, status }
+      : item
+  );
+});
+
+    await fetchAnalytics();
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
@@ -69,6 +107,7 @@ export function DashboardClient() {
           loading={loading}
           page={filters.page}
           onPageChange={setPage}
+           updateStatus={updateStatus}
         />
       </main>
     </div>
