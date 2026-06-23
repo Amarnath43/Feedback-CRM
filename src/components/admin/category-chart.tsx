@@ -23,8 +23,8 @@ export function CategoryChart({ analytics }: { analytics: Analytics | null }) {
           No feedback yet.
         </p>
       ) : (
-        <div className="flex items-center gap-6">
-          <div className="w-40 h-40 shrink-0">
+       <div className="flex flex-col lg:flex-row items-center gap-6">
+          <div className="w-48 h-48 shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -52,11 +52,11 @@ export function CategoryChart({ analytics }: { analytics: Analytics | null }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex-1 space-y-2">
+          <div className="w-full lg:flex-1 space-y-2">
             {chartData.map((entry, i) => (
               <div
                 key={entry.category}
-                className="flex items-center justify-between text-sm"
+               className="flex items-center justify-between text-sm max-w-[200px] mx-auto lg:max-w-none"
               >
                 <div className="flex items-center gap-2">
                   <span
