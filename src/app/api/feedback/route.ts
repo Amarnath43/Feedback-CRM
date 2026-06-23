@@ -4,6 +4,7 @@ import { createFeedbackSchema } from "@/features/feedback/schemas";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { Prisma } from "@prisma/client";
+import { feedbackRateLimit } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +13,6 @@ export async function POST(req: Request) {
     // Validate input
     const parsed = createFeedbackSchema.safeParse(body);
 
-    
     if (!parsed.success) {
       return NextResponse.json(
         {
@@ -22,7 +22,22 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    //what does flattenError do ? give example 
+
+    // Check rate limit
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const ip = forwardedFor
+      ? forwardedFor.split(",")[0].trim()
+      : "anonymous";
+
+    const rateLimit = await feedbackRateLimit.limit(`feedback:${ip}`);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    
 
     const { category, comment, email } = parsed.data;
 
@@ -31,7 +46,7 @@ export async function POST(req: Request) {
       data: {
         category,
         comment,
-        email: email || null, 
+        email: email || null,
       },
       select: {
         id: true,
